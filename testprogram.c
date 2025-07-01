@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   testprogram.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ktrzcins <ktrzcins@student.42vienna.c      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/01 13:14:45 by ktrzcins          #+#    #+#             */
+/*   Updated: 2025/07/01 14:33:51 by ktrzcins         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,34 +36,43 @@ char *get_next_line(int fd)
 	char *txt_output;
 	int numbytes;
 	int c;
+	int linelength;
+	char *trimmedbuffer;
 
 	
+	linelength = 0;
 	c = 0;
 	txt_buffer = malloc(sizeof(char) * (32 + 1));
-	if (!the_text)
+	if (!txt_buffer)
 		return (NULL);
 	numbytes = read(fd, txt_buffer, BUFFER_SIZE);
 	if (numbytes == 0 || numbytes < 0)
 		return (NULL);
 	txt_buffer[numbytes] = '\0';
-	txt_output = malloc(sizeof(char) * (numbytes + 1));
-	if (!txt_output)
-		return (NULL);
-	while (txt_buffer[c] && c < numbytes)
-	{
-		txt_output[c] = txt_buffer[c];
+	while (txt_buffer[c] != '\n' && c < numbytes)
 		c++;
+	if (c < BUFFER_SIZE && ft_isnewline(txt_buffer))
+	{
+		c = ft_isnewline(txt_buffer) + 1;
+		txt_output = malloc(sizeof(char) * c + 1);
+		if (!txt_output)
+			return (NULL);
+		while (linelength < c)
+		{
+			txt_output[linelength] = txt_buffer[linelength];
+			linelength++;
+		}
+		//trim txt_buffer here
 	}
-	if (!ft_ischar(txt_output))
-		get_next_line(fd);
-	txt_output[c] = '\0';
-	return (txt_output);
-}
-
-		
-
-
-
-
-	
-
+	else if (!ft_isnewline(txt_buffer))
+	{
+		txt_output = malloc(sizeof(char) * BUFFER_SIZE + 1);
+		if (!txt_output)
+			return(NULL);
+		while (linelength < BUFFER_SIZE)
+		{
+			txt_output[linelength] = txt_buffer[linelength];
+			linelength++;
+		}
+		//trim txt_buffer here
+	}

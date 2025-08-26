@@ -1,21 +1,9 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ktrzcins <ktrzcins@student.42vienna.c      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/11 14:54:22 by ktrzcins          #+#    #+#             */
-/*   Updated: 2025/08/11 14:54:24 by ktrzcins         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
 static char	*substr(char *str, int start, int len)
 {
-	char	*new_str;
-	int		i;
+	char *new_str;
+	int i;
 
 	new_str = malloc(len + 1);
 	if (!new_str)
@@ -35,39 +23,10 @@ static char	*substr(char *str, int start, int len)
 	return (new_str);
 }
 
-static char	*read_until_newline(int fd, char *old_text)
-{
-	char	*buf;
-	char	*new_text;
-	int		bytes;
-
-	if (!old_text)
-		old_text = substr(NULL, 0, 0);
-	buf = malloc(BUFFER_SIZE + 1);
-	if (!buf || !old_text)
-		return (free(old_text), free(buf), NULL);
-	while (!ft_strchr(old_text, '\n'))
-	{
-		bytes = read(fd, buf, BUFFER_SIZE);
-		if (bytes <= 0)
-			break ;
-		buf[bytes] = '\0';
-		new_text = ft_strjoin(old_text, buf);
-		if (!new_text)
-			return (free(buf), free(old_text), NULL);
-		free(old_text);
-		old_text = new_text;
-	}
-	free(buf);
-	if (bytes == -1)
-		return (free(old_text), NULL);
-	return (old_text);
-}
-
 static char	*extract_line(char *text)
 {
-	int		i;
-	char	*line;
+	int i;
+	char *line;
 
 	if (!text || text[0] == '\0')
 		return (NULL);
@@ -82,9 +41,11 @@ static char	*extract_line(char *text)
 
 static char	*save_rest(char *text)
 {
-	char	*rest;
-	int		i;
+	char *rest;
+	int i;
 
+	if (!text)
+		return (NULL);
 	i = 0;
 	while (text[i] && text[i] != '\n')
 		i++;
@@ -98,23 +59,62 @@ static char	*save_rest(char *text)
 	return (rest);
 }
 
-char	*get_next_line(int fd)
+static char	*read_buffer(int fd, char *old_text)
 {
-	static char	*saved;
-	char		*line;
+	char *buf;
+	int bytes;
+	char *new_text;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	buf = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buf)
 		return (NULL);
-	saved = read_until_newline(fd, saved);
-	if (!saved)
-		return (NULL);
-	line = extract_line(saved);
-	if (!line)
+	bytes = read(fd, buf, BUFFER_SIZE);
+	if (bytes < 0)
 	{
-		free(saved);
-		saved = NULL;
+		free(buf);
 		return (NULL);
 	}
+	if (bytes == 0)
+	{
+		free(buf);
+		return (old_text);
+	}
+	buf[bytes] = '\0';
+	new_text = ft_strjoin(old_text, buf);
+	if (!new_text)
+	{
+		free(buf);
+		return (NULL);
+	}
+	free(old_text);
+	free(buf);
+	return (new_text);
+}
+
+char	*get_next_line(int fd)
+{
+	static char *saved;
+	char *line;
+	char *new_text;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, NULL, 0) < 0)
+		return (free(saved), saved = NULL, NULL);
+	if (!saved)
+		saved = substr(NULL, 0, 0);
+	if (!saved)
+		return (NULL);
+	while (!ft_strchr(saved, '\n'))
+	{
+		new_text = read_buffer(fd, saved);
+		if (!new_text)
+			return (free(saved), saved = NULL, NULL);
+		if (new_text == saved)
+			break ;
+		saved = new_text;
+	}
+	line = extract_line(saved);
+	if (!line)
+		return (free(saved), saved = NULL, NULL);
 	saved = save_rest(saved);
 	return (line);
 }

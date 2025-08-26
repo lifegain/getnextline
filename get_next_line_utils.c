@@ -1,20 +1,8 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ktrzcins <ktrzcins@student.42vienna.c      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/11 14:54:39 by ktrzcins          #+#    #+#             */
-/*   Updated: 2025/08/11 14:54:44 by ktrzcins         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
 size_t	ft_strlen(const char *s)
 {
-	size_t	len;
+	size_t len;
 
 	if (!s)
 		return (0);
@@ -26,7 +14,7 @@ size_t	ft_strlen(const char *s)
 
 char	*ft_strchr(const char *s, int c)
 {
-	int	i;
+	int i;
 
 	if (!s)
 		return (NULL);
@@ -42,10 +30,10 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-static void	ft_bzero(void *s, size_t n)
+void	ft_bzero(void *s, size_t n)
 {
-	char	*str;
-	size_t	i;
+	char *str;
+	size_t i;
 
 	str = (char *)s;
 	i = 0;
@@ -58,7 +46,7 @@ static void	ft_bzero(void *s, size_t n)
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	void	*ptr;
+	void *ptr;
 
 	ptr = malloc(count * size);
 	if (!ptr)
@@ -69,9 +57,9 @@ void	*ft_calloc(size_t count, size_t size)
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char	*result;
-	size_t	i;
-	size_t	j;
+	char *result;
+	size_t i;
+	size_t j;
 
 	if (!s1 || !s2)
 		return (NULL);

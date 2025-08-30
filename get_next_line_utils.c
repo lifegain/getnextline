@@ -1,8 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yourlogin <your@student.42.fr   >        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/30 12:00:00 by yourlogin         #+#    #+#             */
+/*   Updated: 2025/08/30 12:00:00 by yourlogin        ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #include "get_next_line.h"
 
 size_t	ft_strlen(const char *s)
 {
-	size_t len;
+	size_t	len;
 
 	if (!s)
 		return (0);
@@ -14,7 +25,7 @@ size_t	ft_strlen(const char *s)
 
 char	*ft_strchr(const char *s, int c)
 {
-	int i;
+	int	i;
 
 	if (!s)
 		return (NULL);
@@ -32,11 +43,11 @@ char	*ft_strchr(const char *s, int c)
 
 void	ft_bzero(void *s, size_t n)
 {
-	char *str;
-	size_t i;
+	size_t	i;
+	char	*str;
 
-	str = (char *)s;
 	i = 0;
+	str = (char *)s;
 	while (i < n)
 	{
 		str[i] = '\0';
@@ -46,38 +57,40 @@ void	ft_bzero(void *s, size_t n)
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	void *ptr;
+	void	*ptr;
+	size_t	total;
 
-	ptr = malloc(count * size);
+	total = count * size;
+	ptr = malloc(total);
 	if (!ptr)
 		return (NULL);
-	ft_bzero(ptr, count * size);
+	ft_bzero(ptr, total);
 	return (ptr);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char *result;
-	size_t i;
-	size_t j;
+	char	*res;
+	size_t	i;
+	size_t	j;
 
 	if (!s1 || !s2)
 		return (NULL);
-	result = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!result)
+	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (!res)
 		return (NULL);
 	i = 0;
 	while (s1[i])
 	{
-		result[i] = s1[i];
+		res[i] = s1[i];
 		i++;
 	}
 	j = 0;
 	while (s2[j])
 	{
-		result[i + j] = s2[j];
+		res[i + j] = s2[j];
 		j++;
 	}
-	result[i + j] = '\0';
-	return (result);
+	res[i + j] = '\0';
+	return (res);
 }

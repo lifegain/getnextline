@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktrzcins <ktrzcins@student.42vienna.c>      +#+  +:+       +#+        */
+/*   By: ktrzcins <ktrzcins@student.42vienna.c      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 14:54:22 by ktrzcins          #+#    #+#             */
-/*   Updated: 2025/08/31 14:00:00 by ktrzcins         ###   ########.fr       */
+/*   Updated: 2025/08/30 16:04:55 by ktrzcins         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,13 @@ static char	*cut_out_line(char *s)
 	return (line);
 }
 
-char	*save_rest(char *s)
+static char	*save_rest(char *s)
 {
 	int		i;
 	char	*rest;
-	int		len;
 
+	if (!s)
+		return (NULL);
 	i = 0;
 	while (s[i] && s[i] != '\n')
 		i++;
@@ -98,14 +99,12 @@ char	*save_rest(char *s)
 		return (NULL);
 	}
 	i++;
-	len = ft_strlen(s + i);
-	rest = (char *)malloc(len + 1);
+	rest = ft_strjoin(s + i, "");
 	if (!rest)
+	{
+		free(s);
 		return (NULL);
-	len = 0;
-	while (s[i])
-		rest[len++] = s[i++];
-	rest[len] = '\0';
+	}
 	free(s);
 	return (rest);
 }
@@ -113,13 +112,22 @@ char	*save_rest(char *s)
 char	*get_next_line(int fd)
 {
 	static char	*saved;
-	char		*line;
+	char		*tmp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, NULL, 0) < 0
+		|| !fill_buffer(fd, &saved))
+	{
+		free(saved);
+		saved = NULL;
 		return (NULL);
-	if (!fill_buffer(fd, &saved))
+	}
+	tmp = cut_out_line(saved);
+	if (!tmp)
+	{
+		free(saved);
+		saved = NULL;
 		return (NULL);
-	line = cut_out_line(saved);
+	}
 	saved = save_rest(saved);
-	return (line);
+	return (tmp);
 }

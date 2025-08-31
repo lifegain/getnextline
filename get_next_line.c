@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yourlogin <your@student.42.fr   >          +#+  +:+       +#+        */
+/*   By: ktrzcins <ktrzcins@student.42vienna.c>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 12:00:00 by yourlogin         #+#    #+#             */
-/*   Updated: 2025/08/30 12:00:00 by yourlogin        ###   ########.fr       */
+/*   Created: 2025/08/11 14:54:22 by ktrzcins          #+#    #+#             */
+/*   Updated: 2025/08/31 14:00:00 by ktrzcins         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*read_append(int fd, char *old)
+static char	*read_and_join(int fd, char *old)
 {
 	char	*buf;
 	int		n;
@@ -38,7 +38,7 @@ static char	*read_append(int fd, char *old)
 	return (joined);
 }
 
-static int	fill(int fd, char **psaved)
+static int	fill_buffer(int fd, char **psaved)
 {
 	char	*tmp;
 
@@ -50,7 +50,7 @@ static int	fill(int fd, char **psaved)
 	}
 	while (!ft_strchr(*psaved, '\n'))
 	{
-		tmp = read_append(fd, *psaved);
+		tmp = read_and_join(fd, *psaved);
 		if (!tmp)
 			return (0);
 		if (tmp == *psaved)
@@ -60,7 +60,7 @@ static int	fill(int fd, char **psaved)
 	return (1);
 }
 
-static char	*extract_line(char *s)
+static char	*cut_out_line(char *s)
 {
 	int		i;
 	int		j;
@@ -83,13 +83,12 @@ static char	*extract_line(char *s)
 	return (line);
 }
 
-static char	*save_rest(char *s)
+char	*save_rest(char *s)
 {
 	int		i;
 	char	*rest;
+	int		len;
 
-	if (!s)
-		return (NULL);
 	i = 0;
 	while (s[i] && s[i] != '\n')
 		i++;
@@ -99,12 +98,14 @@ static char	*save_rest(char *s)
 		return (NULL);
 	}
 	i++;
-	rest = ft_strjoin(s + i, "");
+	len = ft_strlen(s + i);
+	rest = (char *)malloc(len + 1);
 	if (!rest)
-	{
-		free(s);
 		return (NULL);
-	}
+	len = 0;
+	while (s[i])
+		rest[len++] = s[i++];
+	rest[len] = '\0';
 	free(s);
 	return (rest);
 }
@@ -112,22 +113,13 @@ static char	*save_rest(char *s)
 char	*get_next_line(int fd)
 {
 	static char	*saved;
-	char		*tmp;
+	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, NULL, 0) < 0
-		|| !fill(fd, &saved))
-	{
-		free(saved);
-		saved = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	}
-	tmp = extract_line(saved);
-	if (!tmp)
-	{
-		free(saved);
-		saved = NULL;
+	if (!fill_buffer(fd, &saved))
 		return (NULL);
-	}
+	line = cut_out_line(saved);
 	saved = save_rest(saved);
-	return (tmp);
+	return (line);
 }

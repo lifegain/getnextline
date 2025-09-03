@@ -15,7 +15,7 @@
 static char	*read_and_join(int fd, char *old)
 {
 	char	*buf;
-	int		n;
+	ssize_t	n;
 	char	*joined;
 
 	buf = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
@@ -114,8 +114,7 @@ char	*get_next_line(int fd)
 	static char	*saved;
 	char		*tmp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, NULL, 0) < 0
-		|| !fill_buffer(fd, &saved))
+	if (fd < 0 || BUFFER_SIZE <= 0 || !fill_buffer(fd, &saved))
 	{
 		free(saved);
 		saved = NULL;
